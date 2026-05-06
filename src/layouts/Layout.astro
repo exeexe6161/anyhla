@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import MenuOverlay from "../components/MenuOverlay.astro";
 
 interface Props {
   title?: string;
@@ -37,9 +38,43 @@ const {
   </head>
   <body>
     <Header />
+    <MenuOverlay />
     <main class="main">
       <slot />
     </main>
     <Footer />
+    <script is:inline>
+      (function () {
+        const header = document.querySelector(".header");
+        const onScroll = function () {
+          if (header) header.classList.toggle("header--scrolled", window.scrollY > 20);
+        };
+        document.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+
+        const overlay = document.querySelector(".menu-overlay");
+        const openBtn = document.querySelector(".menu-btn");
+        const closeBtn = document.querySelector(".menu-close");
+        const setOpen = function (open) {
+          if (!overlay) return;
+          overlay.dataset.open = open ? "true" : "false";
+          overlay.setAttribute("aria-hidden", open ? "false" : "true");
+          document.body.classList.toggle("menu-open", open);
+          if (openBtn) openBtn.setAttribute("aria-expanded", open ? "true" : "false");
+          if (open && closeBtn) closeBtn.focus();
+          else if (!open && openBtn) openBtn.focus();
+        };
+        if (openBtn) openBtn.addEventListener("click", function () { setOpen(true); });
+        if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); });
+        if (overlay) {
+          overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) setOpen(false);
+          });
+        }
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && overlay && overlay.dataset.open === "true") setOpen(false);
+        });
+      })();
+    </script>
   </body>
 </html>
