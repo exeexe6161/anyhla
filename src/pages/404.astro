@@ -6,6 +6,20 @@ import Layout from "../layouts/Layout.astro";
   <section class="not-found">
     <h1>404</h1>
     <p class="subtitle">Diese Seite existiert nicht.</p>
-    <a href="/" class="not-found-link">Zur Startseite</a>
+    <a href="/de/" class="not-found-link">Zur Startseite</a>
   </section>
+  <script is:inline>
+    (function () {
+      if (window.location.pathname.indexOf("/en/") === 0) {
+        document.documentElement.lang = "en";
+        const subtitle = document.querySelector(".not-found .subtitle");
+        const link = document.querySelector(".not-found-link");
+        if (subtitle) subtitle.textContent = "This page does not exist.";
+        if (link) {
+          link.textContent = "To homepage";
+          link.setAttribute("href", "/en/");
+        }
+      }
+    })();
+  </script>
 </Layout>

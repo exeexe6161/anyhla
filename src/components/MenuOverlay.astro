@@ -1,9 +1,14 @@
 ---
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const base = `/${lang}`;
 ---
 
 <div id="menu-overlay" class="menu-overlay" data-open="false" aria-hidden="true">
   <div class="menu-panel">
-    <button class="menu-close" type="button" aria-label="Menü schließen">
+    <button class="menu-close" type="button" aria-label={t("nav.close")}>
       <svg
         width="24"
         height="24"
@@ -17,14 +22,14 @@
         <path d="M6 6 L18 18 M6 18 L18 6" />
       </svg>
     </button>
-    <nav class="menu-primary" aria-label="Hauptnavigation">
-      <a href="/">Arbeiten</a>
-      <a href="/about">Über</a>
-      <a href="/contact">Kontakt</a>
+    <nav class="menu-primary" aria-label={t("menu.primary")}>
+      <a href={`${base}/`}>{t("nav.works")}</a>
+      <a href={`${base}/about/`}>{t("nav.about")}</a>
+      <a href={`${base}/contact/`}>{t("nav.contact")}</a>
     </nav>
-    <nav class="menu-secondary" aria-label="Rechtliches">
-      <a href="/impressum">Impressum</a>
-      <a href="/datenschutz">Datenschutz</a>
+    <nav class="menu-secondary" aria-label={t("menu.legal")}>
+      <a href={`${base}/impressum/`}>{t("nav.imprint")}</a>
+      <a href={`${base}/datenschutz/`}>{t("nav.privacy")}</a>
     </nav>
   </div>
 </div>

@@ -1,0 +1,13 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { useTranslations } from "../../i18n/utils";
+
+const t = useTranslations("en");
+---
+
+<Layout title={`${t("about.title")} — Anyhla`} description="About Anyhla">
+  <article class="article-page">
+    <h1>{t("about.title")}</h1>
+    <p>{t("about.placeholder")}</p>
+  </article>
+</Layout>

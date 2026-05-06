@@ -1,0 +1,13 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { useTranslations } from "../../i18n/utils";
+
+const t = useTranslations("en");
+---
+
+<Layout title={`${t("imprint.title")} — Anyhla`} description="Imprint">
+  <article class="article-page">
+    <h1>{t("imprint.title")}</h1>
+    <p>{t("imprint.placeholder")}</p>
+  </article>
+</Layout>

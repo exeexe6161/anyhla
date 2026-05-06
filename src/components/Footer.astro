@@ -1,11 +1,15 @@
 ---
-const year = new Date().getFullYear();
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const base = `/${lang}`;
 ---
 
 <footer class="footer">
   <nav>
-    <a href="/impressum">Impressum</a>
-    <a href="/datenschutz">Datenschutz</a>
+    <a href={`${base}/impressum/`}>{t("nav.imprint")}</a>
+    <a href={`${base}/datenschutz/`}>{t("nav.privacy")}</a>
   </nav>
-  <p>© {year} Anyhla</p>
+  <p>{t("footer.copyright")}</p>
 </footer>
