@@ -16,7 +16,24 @@ const enPath = getLocalizedPath(pathname, "en");
     aria-label={t("nav.menu")}
     aria-controls="menu-overlay"
     aria-expanded="false"
-  >{t("nav.menu")}</button>
+  >
+    <span class="menu-btn-text">{t("nav.menu")}</span>
+    <svg
+      class="menu-btn-icon"
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.6"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M4 7 L20 7" />
+      <path d="M4 12 L20 12" />
+      <path d="M4 17 L20 17" />
+    </svg>
+  </button>
   <a href={homeHref} class="wordmark" aria-label={`Anyhla — ${t("nav.home")}`}>
     <img src="/brand/anyhla-wordmark.svg" alt="Anyhla" />
   </a>
