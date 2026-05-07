@@ -131,7 +131,7 @@ a {
   line-height: 0;
 }
 
-.wordmark img {
+.wordmark svg {
   height: 1.5rem;
   width: auto;
 }
@@ -456,7 +456,7 @@ a {
     padding: max(0.875rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 0.875rem max(1rem, env(safe-area-inset-left));
   }
 
-  .wordmark img {
+  .wordmark svg {
     height: 1.125rem;
   }
 
@@ -490,7 +490,7 @@ a {
 }
 
 @media (max-width: 360px) {
-  .wordmark img {
+  .wordmark svg {
     height: 1rem;
   }
 
