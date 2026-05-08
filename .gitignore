@@ -30,3 +30,6 @@ pnpm-debug.log*
 .DS_Store
 .env
 .env.local
+
+# Brand asset backup (rollback only, not for repo)
+public/brand-v1-backup/
