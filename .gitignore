@@ -27,6 +27,7 @@ pnpm-debug.log*
 .design-ref/
 *.psd
 *.sketch
+*.bak
 .DS_Store
 .env
 .env.local
