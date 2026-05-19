@@ -119,6 +119,15 @@
 
   .stage{position:fixed;inset:0;overflow:hidden}
 
+  .letterbox{
+    position:fixed;left:0;right:0;height:50px;background:#0E0E0C;
+    z-index:6;pointer-events:none;opacity:0;
+    transition:opacity 0.6s ease 1.0s;
+  }
+  .letterbox.top{top:0}
+  .letterbox.bot{bottom:0}
+  .ready .letterbox{opacity:1}
+
   .frame{
     position:absolute;inset:0;
     background:#0d0a08;
@@ -278,6 +287,49 @@
   .door.top{top:0;transform:translateY(-100%)}
   .door.bot{bottom:0}
 
+  .side-label{
+    position:fixed;left:clamp(20px,2vw,32px);top:50%;
+    transform:translateY(-50%) rotate(-90deg);transform-origin:left center;
+    z-index:7;font-family:'Inter Variable',system-ui,sans-serif;
+    font-size:10px;font-weight:400;letter-spacing:0.42em;
+    text-transform:uppercase;color:rgba(243,234,217,0.5);
+    pointer-events:none;white-space:nowrap;opacity:0;
+    transition:opacity 0.9s ease 1.3s;
+  }
+  .ready .side-label{opacity:1}
+
+  .skip-hint{
+    position:fixed;top:calc(50% + 90px);left:50%;
+    transform:translateX(-50%);z-index:91;
+    color:rgba(243,234,217,0.35);
+    font-family:'Inter Variable',system-ui,sans-serif;
+    font-size:9px;letter-spacing:0.42em;text-transform:uppercase;
+    pointer-events:none;white-space:nowrap;opacity:0;
+    transition:opacity 0.6s ease 1.2s;
+  }
+  .curtain:not(.gone) .skip-hint{opacity:1}
+
+  @media (hover: hover) and (pointer: fine){
+    body.has-custom-cursor{cursor:none}
+    body.has-custom-cursor a,body.has-custom-cursor button{cursor:none}
+    .custom-cursor{
+      position:fixed;top:0;left:0;
+      width:12px;height:12px;
+      border:1px solid var(--cream);border-radius:50%;
+      pointer-events:none;z-index:9999;
+      transform:translate(-50%,-50%);
+      transition:width 0.2s ease,height 0.2s ease,background-color 0.2s ease;
+      will-change:transform;
+    }
+    .custom-cursor.is-hovering{
+      width:32px;height:32px;
+      background:rgba(243,234,217,0.15);
+    }
+  }
+  @media (hover: none),(pointer: coarse){
+    .custom-cursor{display:none !important}
+  }
+
   @media (max-width:720px){
     .center{margin-bottom:40px}
     .loader .word{
@@ -294,11 +346,15 @@
     .bottom .meta-l{justify-self:start}
     .bottom .meta-c{display:none}
     .bottom .meta-r{justify-self:end}
+    .letterbox{height:30px}
+    .side-label{display:none}
+    .skip-hint{font-size:8px;top:calc(50% + 75px)}
   }
 
   @media (prefers-reduced-motion: reduce){
     .photo,.loader .word span,.slat,.curtain,.chrome > *,
-    .display .w > span,.grain,.progress::after{
+    .display .w > span,.grain,.progress::after,
+    .letterbox,.side-label,.skip-hint,.custom-cursor{
       animation:none !important;
       transition:none !important;
     }
@@ -318,10 +374,15 @@
       </div>
       <div class="progress"></div>
     </div>
+    <div class="skip-hint">tap to enter</div>
   </div>
 
   <div class="door top"></div>
   <div class="door bot"></div>
+
+  <div class="letterbox top" aria-hidden="true"></div>
+  <div class="letterbox bot" aria-hidden="true"></div>
+  <div class="custom-cursor" aria-hidden="true"></div>
 
   <main class="stage" id="stage">
 
@@ -342,6 +403,8 @@
     </div>
 
     <div class="glow" id="glow"></div>
+
+    <div class="side-label" aria-hidden="true">est. 2026 · anyhla</div>
 
     <div class="chrome">
       <header class="top">
@@ -396,6 +459,13 @@
 
     setTimeout(function(){ dropCurtain(); }, 4000);
 
+    curtain.addEventListener('click', function(){
+      if (!dropped) {
+        dropped = true;
+        dropCurtain();
+      }
+    }, { once: true });
+
     var motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var glow = document.getElementById('glow');
     if (motionOK && glow){
@@ -407,6 +477,39 @@
       }, {passive:true});
     }
 
+    (function initCursor(){
+      if (!matchMedia('(hover: hover) and (pointer: fine)').matches){
+        var c = document.querySelector('.custom-cursor');
+        if (c) c.remove();
+        return;
+      }
+      document.body.classList.add('has-custom-cursor');
+      var cursor = document.querySelector('.custom-cursor');
+      if (!cursor) return;
+      var mx = 0, my = 0, cx = 0, cy = 0;
+      document.addEventListener('pointermove', function(e){
+        mx = e.clientX;
+        my = e.clientY;
+      }, { passive: true });
+      function loop(){
+        cx += (mx - cx) * 0.25;
+        cy += (my - cy) * 0.25;
+        cursor.style.transform = 'translate(' + cx + 'px, ' + cy + 'px) translate(-50%, -50%)';
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+      var hoverables = 'a, button, .enter';
+      document.body.addEventListener('pointerover', function(e){
+        if (e.target.closest(hoverables)) cursor.classList.add('is-hovering');
+      }, { passive: true });
+      document.body.addEventListener('pointerout', function(e){
+        var rel = e.relatedTarget;
+        if (e.target.closest(hoverables) && !(rel && rel.closest && rel.closest(hoverables))) {
+          cursor.classList.remove('is-hovering');
+        }
+      }, { passive: true });
+    })();
+
     function enter(){
       document.body.classList.add('exiting');
       setTimeout(function(){
@@ -416,6 +519,11 @@
 
     document.getElementById('enter').addEventListener('click', enter);
     window.addEventListener('keydown', function(e){
+      if (e.key === 'Escape'){
+        e.preventDefault();
+        window.location.href = getLangPath();
+        return;
+      }
       if (e.key === 'Enter' || e.key === ' '){
         e.preventDefault();
         enter();

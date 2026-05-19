@@ -93,5 +93,41 @@ const {
         });
       })();
     </script>
+    <div class="custom-cursor" aria-hidden="true"></div>
+    <script is:inline>
+      (function () {
+        if (!matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          const c = document.querySelector('.custom-cursor');
+          if (c) c.remove();
+          return;
+        }
+        document.body.classList.add('has-custom-cursor');
+        const cursor = document.querySelector('.custom-cursor');
+        if (!cursor) return;
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        document.addEventListener('pointermove', function (e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        }, { passive: true });
+        function loop() {
+          cursorX += (mouseX - cursorX) * 0.25;
+          cursorY += (mouseY - cursorY) * 0.25;
+          cursor.style.transform = 'translate(' + cursorX + 'px, ' + cursorY + 'px) translate(-50%, -50%)';
+          requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+        const hoverables = 'a, button, [role="button"]';
+        document.body.addEventListener('pointerover', function (e) {
+          if (e.target.closest(hoverables)) cursor.classList.add('is-hovering');
+        }, { passive: true });
+        document.body.addEventListener('pointerout', function (e) {
+          const rel = e.relatedTarget;
+          if (e.target.closest(hoverables) && !(rel && rel.closest && rel.closest(hoverables))) {
+            cursor.classList.remove('is-hovering');
+          }
+        }, { passive: true });
+      })();
+    </script>
   </body>
 </html>
